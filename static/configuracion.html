@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuración - Parqueadero</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3">
+        <a class="navbar-brand fw-bold" href="index.html">🚗 Parqueadero POS</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="index.html">Operación</a>
+            <a class="nav-link" href="registros.html">Registros</a>
+            <a class="nav-link active" href="configuracion.html">Configuración</a>
+        </div>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">Nuevo Tipo de Vehículo</div>
+                <div class="card-body">
+                    <form id="form-tipo">
+                        <div class="mb-2"><input type="text" id="nombre" class="form-control" placeholder="NOMBRE (EJ. CARRO)" oninput="this.value = this.value.toUpperCase().replace(/[^A-ZÑ\s]/g, '')" required></div>
+                        <div class="mb-2"><input type="number" id="t_hora" class="form-control" placeholder="Tarifa Hora" min="0" required></div>
+                        <div class="mb-2"><input type="number" id="t_dia" class="form-control" placeholder="Tarifa Día" min="0" required></div>
+                        <div class="mb-2"><input type="number" id="t_noche" class="form-control" placeholder="Tarifa Noche" min="0" required></div>
+                        <button type="submit" id="btn-guardar" class="btn btn-primary w-100 mb-2">Guardar</button>
+                        <button type="button" id="btn-cancelar" onclick="cancelarEdicion()" class="btn btn-outline-secondary w-100" style="display: none;">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">Tipos Configurados</div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead><tr><th>Nombre</th><th>T. Hora</th><th>T. Día</th><th>T. Noche</th><th>Acción</th></tr></thead>
+                        <tbody id="lista-tipos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let idEditando = null;
+
+    async function cargarTipos() {
+        const res = await fetch("/tipos-vehiculo");
+        const tipos = await res.json();
+        const lista = document.getElementById("lista-tipos");
+        lista.innerHTML = "";
+        
+        // Guardamos los datos globalmente para poder editarlos fácilmente
+        window.tiposData = tipos;
+
+        tipos.forEach(t => {
+            lista.innerHTML += `<tr>
+                <td>${t.nombre}</td>
+                <td>$${t.tarifa_hora}</td>
+                <td>$${t.tarifa_dia}</td>
+                <td>$${t.tarifa_noche}</td>
+                <td>
+                    <button onclick="cargarParaEditar('${t.id}')" class="btn btn-sm btn-outline-primary">✏️ Editar</button>
+                </td>
+            </tr>`;
+        });
+    }
+
+    function cargarParaEditar(id) {
+        const tipo = window.tiposData.find(t => t.id === id);
+        if(!tipo) return;
+        
+        idEditando = id;
+        document.getElementById("nombre").value = tipo.nombre;
+        document.getElementById("t_hora").value = tipo.tarifa_hora;
+        document.getElementById("t_dia").value = tipo.tarifa_dia;
+        document.getElementById("t_noche").value = tipo.tarifa_noche;
+        
+        document.getElementById("btn-guardar").innerText = "Actualizar Tipo";
+        document.getElementById("btn-guardar").classList.replace("btn-primary", "btn-warning");
+        document.getElementById("btn-cancelar").style.display = "block";
+    }
+
+    function cancelarEdicion() {
+        idEditando = null;
+        document.getElementById("form-tipo").reset();
+        document.getElementById("btn-guardar").innerText = "Guardar";
+        document.getElementById("btn-guardar").classList.replace("btn-warning", "btn-primary");
+        document.getElementById("btn-cancelar").style.display = "none";
+    }
+
+    document.getElementById("form-tipo").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const payload = {
+            nombre: document.getElementById("nombre").value,
+            tarifa_hora: parseFloat(document.getElementById("t_hora").value),
+            tarifa_dia: parseFloat(document.getElementById("t_dia").value),
+            tarifa_noche: parseFloat(document.getElementById("t_noche").value)
+        };
+        
+        if(idEditando) {
+            await fetch(`/tipos-vehiculo/${idEditando}`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload)
+            });
+        } else {
+            await fetch("/tipos-vehiculo", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload)
+            });
+        }
+        
+        cancelarEdicion();
+        cargarTipos();
+    });
+
+    cargarTipos();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>POS - Parqueadero</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <!-- Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3">
+        <a class="navbar-brand fw-bold" href="index.html">🚗 Parqueadero POS</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link active" href="index.html">Operación</a>
+            <a class="nav-link" href="registros.html">Registros</a>
+            <a class="nav-link" href="configuracion.html">Configuración</a>
+        </div>
+    </nav>
+
+    <div class="row">
+        <!-- INGRESO -->
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header text-success fs-5">ENTRADA (Ingreso)</div>
+                <div class="card-body">
+                    <form id="form-ingreso">
+                        <div class="mb-3">
+                            <label>Placa:</label>
+                            <input type="text" id="placa" class="form-control form-control-lg text-uppercase" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, '')" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Tipo:</label>
+                            <select id="select-tipo" class="form-select" required></select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 py-2 fs-5 fw-bold">Generar Ingreso e Imprimir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- SALIDA -->
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header text-danger fs-5">SALIDA Y COBRO</div>
+                <div class="card-body">
+                    <form id="form-pre-salida">
+                        <div class="mb-3">
+                            <label>ID del Ticket o Placa:</label>
+                            <input type="text" id="id-ticket" class="form-control form-control-lg text-uppercase" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 py-3 fs-5 fw-bold text-dark">🔍 Buscar y Liquidar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Liquidación -->
+<div class="modal fade" id="modalLiquidacion" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Confirmar Salida - <span id="mod-placa"></span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h4 class="text-center mb-3">Tiempo: <span id="mod-horas" class="text-primary"></span> Horas</h4>
+        <h2 class="text-center text-success mb-4">Total: $<span id="mod-total"></span></h2>
+        
+        <div class="form-check mb-2 text-start">
+            <input type="checkbox" class="form-check-input" id="check-personalizado">
+            <label class="form-check-label text-muted" for="check-personalizado">Modificar valor a cobrar manualmente</label>
+        </div>
+        <div id="div-personalizado" style="display: none;">
+            <input type="number" id="valor-personalizado" class="form-control form-control-lg text-success fw-bold" placeholder="¿Cuánto vas a cobrar?" min="0">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger px-4 fw-bold" id="btn-confirmar-salida">Confirmar y Cobrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    async function cargarTipos() {
+        const res = await fetch("/tipos-vehiculo");
+        const tipos = await res.json();
+        const select = document.getElementById("select-tipo");
+        select.innerHTML = '<option value="">Seleccione...</option>';
+        tipos.forEach(t => {
+            select.innerHTML += `<option value="${t.id}">${t.nombre}</option>`;
+        });
+    }
+
+    document.getElementById("form-ingreso").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const payload = {
+            placa: document.getElementById("placa").value.toUpperCase(),
+            id_tipo_vehiculo: document.getElementById("select-tipo").value
+        };
+        const res = await fetch("/ticket/ingreso", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(res.ok) {
+            // Abrir el ticket en una nueva ventana para imprimir
+            window.open(`ticket.html?id=${data.id}&tipo=ingreso`, '_blank');
+            e.target.reset();
+        } else {
+            alert(data.detail);
+        }
+    });
+
+    // Lógica para mostrar/ocultar el input de valor personalizado en el modal
+    document.getElementById("check-personalizado").addEventListener("change", function() {
+        document.getElementById("div-personalizado").style.display = this.checked ? 'block' : 'none';
+        if (!this.checked) document.getElementById("valor-personalizado").value = "";
+    });
+
+    let currentTicketId = null;
+    let modalInstance = null;
+
+    document.getElementById("form-pre-salida").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const idTicket = document.getElementById("id-ticket").value;
+        
+        const res = await fetch("/ticket/pre-salida/" + idTicket);
+        const data = await res.json();
+        
+        if (res.ok) {
+            currentTicketId = data.id;
+            document.getElementById("mod-placa").innerText = data.placa;
+            document.getElementById("mod-horas").innerText = data.total_horas;
+            document.getElementById("mod-total").innerText = data.precio_total.toLocaleString();
+            
+            // Reset custom
+            document.getElementById("check-personalizado").checked = false;
+            document.getElementById("div-personalizado").style.display = "none";
+            document.getElementById("valor-personalizado").value = "";
+            
+            if(!modalInstance) modalInstance = new bootstrap.Modal(document.getElementById('modalLiquidacion'));
+            modalInstance.show();
+        } else {
+            alert(data.detail || "Error al buscar ticket");
+        }
+    });
+
+    document.getElementById("btn-confirmar-salida").addEventListener("click", async () => {
+        const isCustom = document.getElementById("check-personalizado").checked;
+        const customValue = document.getElementById("valor-personalizado").value;
+        const payload = {};
+        if (isCustom && customValue !== "") {
+            payload.precio_personalizado = parseFloat(customValue);
+        }
+
+        const res = await fetch("/ticket/salida/" + currentTicketId, { 
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            modalInstance.hide();
+            document.getElementById("form-pre-salida").reset();
+            window.open(`ticket.html?id=${data.id}&tipo=salida`, '_blank');
+        } else {
+            const err = await res.json();
+            alert(err.detail || "Error al registrar salida");
+        }
+    });
+
+    cargarTipos();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,82 @@
+/* style.css */
+body {
+    background-color: #f8f9fa;
+    padding-top: 1rem;
+}
+.card {
+    box-shadow: 0 4px 6px rgba(0,0,0,.05);
+    border: none;
+    margin-bottom: 20px;
+}
+.card-header {
+    background-color: #fff;
+    font-weight: bold;
+    border-bottom: 2px solid #f8f9fa;
+}
+.navbar {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* ==========================================
+   ESTILOS PARA IMPRESORA TÉRMICA POS (80mm)
+   ========================================== */
+@media print {
+    /* Ocultar interfaz del navegador */
+    @page { margin: 0; }
+    
+    /* Ocultar todo menos el área imprimible */
+    body * {
+        visibility: hidden;
+    }
+    
+    #printable-ticket, #printable-ticket * {
+        visibility: visible;
+    }
+    
+    #printable-ticket {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 78mm; /* Ajuste para impresora 80mm */
+        margin: 0;
+        padding: 2mm;
+        font-family: 'Courier New', Courier, monospace;
+        color: #000;
+        background: #fff;
+    }
+}
+
+.pos-ticket {
+    width: 320px;
+    margin: 0 auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.2;
+    padding: 15px;
+    border: 1px dashed #ccc; /* Solo visible en pantalla */
+    background-color: #fff;
+}
+
+.pos-ticket h3, .pos-ticket h4 {
+    text-align: center;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.pos-ticket .divider {
+    border-top: 1px dashed #000;
+    margin: 10px 0;
+}
+
+.pos-ticket .row-data {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.pos-ticket .text-center {
+    text-align: center;
+}
+

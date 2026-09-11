@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Imprimir Ticket</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- El contenedor principal que se imprimirá -->
+<div id="printable-ticket" class="pos-ticket shadow-sm my-4">
+    <div class="text-center mb-2">
+        <h3>PARQUEADERO</h3>
+        <h4 id="t-nombre-parq">---</h4>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="text-center mb-2">
+        <h2 id="t-titulo" style="margin:0;">TICKET</h2>
+        <h4 id="t-placa" style="font-size: 24px; margin: 5px 0;">XXX-000</h4>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="row-data">
+        <span>TICKET No:</span>
+        <span id="t-id" style="font-size: 10px;">...</span>
+    </div>
+    <div class="row-data">
+        <span>INGRESO:</span>
+        <span id="t-ingreso">...</span>
+    </div>
+    
+    <!-- Estos campos solo se muestran si es salida -->
+    <div id="seccion-salida" style="display: none;">
+        <div class="row-data">
+            <span>SALIDA:</span>
+            <span id="t-salida">...</span>
+        </div>
+        <div class="row-data">
+            <span>TIEMPO:</span>
+            <span id="t-horas">... h</span>
+        </div>
+        <div class="divider"></div>
+        <div class="row-data" style="font-size: 18px; font-weight: bold;">
+            <span>TOTAL:</span>
+            <span id="t-total">$0</span>
+        </div>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="text-center mt-3" style="font-size: 12px;">
+        <p id="t-mensaje" class="mb-1">Conserve este ticket.</p>
+        <p>No nos hacemos responsables por objetos de valor dejados en el vehículo.</p>
+        <p>¡Gracias por su visita!</p>
+    </div>
+    
+    <!-- Simulación de código de barras para el POS -->
+    <div class="barcode">
+        || | ||| || ||| || ||| || | ||
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const ticketId = urlParams.get('id');
+    const tipo = urlParams.get('tipo'); // 'ingreso' o 'salida'
+
+    async function cargarTicket() {
+        if (!ticketId) {
+            document.body.innerHTML = "<h3 class='text-center mt-5'>No se proporcionó ID de ticket</h3>";
+            return;
+        }
+
+        try {
+            const res = await fetch(`/ticket/${ticketId}`);
+            if (!res.ok) throw new Error("Ticket no encontrado");
+            const t = await res.json();
+            
+            document.getElementById('t-nombre-parq').innerText = t.nombre_parqueadero.toUpperCase();
+            document.getElementById('t-placa').innerText = t.placa;
+            document.getElementById('t-id').innerText = t.id.split('-')[0].toUpperCase(); // Mostrar forma corta
+            document.getElementById('t-ingreso').innerText = new Date(t.fecha_ingreso).toLocaleString();
+            
+            if (tipo === 'salida' && t.fecha_salida) {
+                document.getElementById('t-titulo').innerText = "FACTURA";
+                document.getElementById('seccion-salida').style.display = 'block';
+                document.getElementById('t-salida').innerText = new Date(t.fecha_salida).toLocaleString();
+                document.getElementById('t-horas').innerText = t.total_horas;
+                document.getElementById('t-total').innerText = `$${t.precio_total.toLocaleString()}`;
+                document.getElementById('t-mensaje').innerText = "Pago exitoso.";
+            } else {
+                document.getElementById('t-titulo').innerText = "INGRESO";
+            }
+
+            // Iniciar impresión automáticamente tras cargar los datos
+            setTimeout(() => {
+                window.print();
+            }, 500);
+
+        } catch (error) {
+            console.error(error);
+            document.body.innerHTML = "<h3 class='text-center mt-5'>Error cargando el ticket</h3>";
+        }
+    }
+
+    cargarTicket();
+</script>
+</body>
+</html>
+

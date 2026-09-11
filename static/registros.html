@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registros - Parqueadero</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3">
+        <a class="navbar-brand fw-bold" href="index.html">🚗 Parqueadero POS</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="index.html">Operación</a>
+            <a class="nav-link active" href="registros.html">Registros</a>
+            <a class="nav-link" href="configuracion.html">Configuración</a>
+        </div>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">Historial de Vehículos</div>
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Placa</th>
+                        <th>Ingreso</th>
+                        <th>Salida</th>
+                        <th>Estado</th>
+                        <th>Cobro</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-tickets"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function cargarTickets() {
+        const res = await fetch("/ticket");
+        const tickets = await res.json();
+        const lista = document.getElementById("lista-tickets");
+        lista.innerHTML = "";
+        
+        tickets.forEach(t => {
+            const fechaIngreso = new Date(t.fecha_ingreso).toLocaleString();
+            const fechaSalida = t.fecha_salida ? new Date(t.fecha_salida).toLocaleString() : '-';
+            const estado = t.fecha_salida ? '<span class="badge bg-secondary">Finalizado</span>' : '<span class="badge bg-success">Activo</span>';
+            const cobro = t.precio_total ? `$${t.precio_total}` : '-';
+            const tipoImpresion = t.fecha_salida ? 'salida' : 'ingreso';
+
+            lista.innerHTML += `
+                <tr>
+                    <td class="fw-bold text-uppercase">${t.placa}</td>
+                    <td><small>${fechaIngreso}</small></td>
+                    <td><small>${fechaSalida}</small></td>
+                    <td>${estado}</td>
+                    <td class="fw-bold">${cobro}</td>
+                    <td>
+                        <button onclick="imprimir('${t.id}', '${tipoImpresion}')" class="btn btn-sm btn-outline-dark me-1">
+                            🖨️
+                        </button>
+                        <button onclick="eliminar('${t.id}')" class="btn btn-sm btn-outline-danger">
+                            🗑️
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    async function eliminar(id) {
+        if(confirm("¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.")) {
+            const res = await fetch(`/ticket/${id}`, { method: 'DELETE' });
+            if(res.ok) {
+                cargarTickets();
+            } else {
+                alert("Error al eliminar el registro.");
+            }
+        }
+    }
+
+    function imprimir(id, tipo) {
+        window.open(`ticket.html?id=${id}&tipo=${tipo}`, '_blank');
+    }
+
+    cargarTickets();
+</script>
+</body>
+</html>
+
