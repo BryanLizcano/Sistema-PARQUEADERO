@@ -1,0 +1,14 @@
+# Base de datos SQLite local y archivos WAL (NUNCA subir a Git para no sobrescribir datos de producción)
+*.db
+*.db-wal
+*.db-shm
+
+# Respaldos locales
+backups/
+
+# Entornos virtuales y caché de Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/

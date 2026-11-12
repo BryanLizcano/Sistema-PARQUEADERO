@@ -1,0 +1,1610 @@
+openapi: 3.1.0
+info:
+  title: "Parqueadero POS API"
+  description: "API REST de Sistema-PARQUEADERO con autenticación por cookie httpOnly, permisos por rol (admin/cajero), paginación indexada, auditoría y exportación en streaming."
+  version: 1.0.0
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - "Autenticación"
+      summary: Login
+      operationId: login_api_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/LoginResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "429":
+          description: "Demasiados intentos de inicio de sesión"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+  /api/auth/logout:
+    post:
+      tags:
+        - "Autenticación"
+      summary: Logout
+      operationId: logout_api_auth_logout_post
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MessageResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+  /api/auth/me:
+    get:
+      tags:
+        - "Autenticación"
+      summary: Me
+      operationId: me_api_auth_me_get
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MeResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /api/auth/cambiar-password:
+    post:
+      tags:
+        - "Autenticación"
+      summary: "Cambiar Password"
+      operationId: cambiar_password_api_auth_cambiar_password_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CambiarPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MessageResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /tipos-vehiculo:
+    get:
+      tags:
+        - "Tipos de Vehículo"
+      summary: "Listar Tipos Vehiculo"
+      operationId: listar_tipos_vehiculo_tipos_vehiculo_get
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/TipoVehiculo"
+                type: array
+                title: "Response Listar Tipos Vehiculo Tipos Vehiculo Get"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+    post:
+      tags:
+        - "Tipos de Vehículo"
+      summary: "Crear Tipo Vehiculo"
+      operationId: crear_tipo_vehiculo_tipos_vehiculo_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TipoVehiculoCreate"
+        required: true
+      responses:
+        "201":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TipoVehiculo"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /tipos-vehiculo/{id_tipo}:
+    put:
+      tags:
+        - "Tipos de Vehículo"
+      summary: "Actualizar Tipo Vehiculo"
+      operationId: actualizar_tipo_vehiculo_tipos_vehiculo__id_tipo__put
+      parameters:
+        - name: id_tipo
+          in: path
+          required: true
+          schema:
+            type: string
+            title: "Id Tipo"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TipoVehiculoCreate"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TipoVehiculo"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /ticket/ingreso:
+    post:
+      tags:
+        - Tickets
+      summary: "Registrar Ingreso"
+      operationId: registrar_ingreso_ticket_ingreso_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TicketCreate"
+        required: true
+      responses:
+        "201":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ticket"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /ticket/pre-salida/{identificador}:
+    get:
+      tags:
+        - Tickets
+      summary: "Pre Salida Ticket"
+      operationId: pre_salida_ticket_ticket_pre_salida__identificador__get
+      parameters:
+        - name: identificador
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Identificador
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: "{}"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /ticket/salida/{identificador}:
+    put:
+      tags:
+        - Tickets
+      summary: "Registrar Salida"
+      operationId: registrar_salida_ticket_salida__identificador__put
+      parameters:
+        - name: identificador
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Identificador
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - "$ref": "#/components/schemas/TicketSalida"
+                - type: "null"
+              title: Payload
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ticket"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /ticket/{id_ticket}/precio:
+    put:
+      tags:
+        - Tickets
+      summary: "Editar Precio Ticket"
+      operationId: editar_precio_ticket_ticket__id_ticket__precio_put
+      parameters:
+        - name: id_ticket
+          in: path
+          required: true
+          schema:
+            type: string
+            title: "Id Ticket"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TicketEditarPrecio"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ticket"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+    patch:
+      tags:
+        - Tickets
+      summary: "Editar Precio Ticket"
+      operationId: editar_precio_ticket_ticket__id_ticket__precio_patch
+      parameters:
+        - name: id_ticket
+          in: path
+          required: true
+          schema:
+            type: string
+            title: "Id Ticket"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TicketEditarPrecio"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ticket"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /ticket/{id_ticket}:
+    put:
+      tags:
+        - Tickets
+      summary: "Editar Ticket"
+      operationId: editar_ticket_ticket__id_ticket__put
+      parameters:
+        - name: id_ticket
+          in: path
+          required: true
+          schema:
+            type: string
+            title: "Id Ticket"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TicketUpdateAdmin"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ticket"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+    get:
+      tags:
+        - Tickets
+      summary: "Obtener Ticket"
+      operationId: obtener_ticket_ticket__id_ticket__get
+      parameters:
+        - name: id_ticket
+          in: path
+          required: true
+          schema:
+            type: string
+            title: "Id Ticket"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ticket"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+    delete:
+      tags:
+        - Tickets
+      summary: "Eliminar Ticket"
+      operationId: eliminar_ticket_ticket__id_ticket__delete
+      parameters:
+        - name: id_ticket
+          in: path
+          required: true
+          schema:
+            type: string
+            title: "Id Ticket"
+      responses:
+        "204":
+          description: "Successful Response"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /ticket:
+    get:
+      tags:
+        - Tickets
+      summary: "Listar Tickets"
+      operationId: listar_tickets_ticket_get
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                items:
+                  "$ref": "#/components/schemas/Ticket"
+                type: array
+                title: "Response Listar Tickets Ticket Get"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /api/registros:
+    get:
+      tags:
+        - Registros
+      summary: "Listar Registros"
+      operationId: listar_registros_api_registros_get
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            title: Page
+        - name: limit
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            default: "50"
+            title: Limit
+        - name: estado
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            title: Estado
+        - name: placa
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            title: Placa
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RegistrosPaginadosResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /api/exportar/anios:
+    get:
+      tags:
+        - "Exportación"
+      summary: "Listar años con registros activos/históricos disponibles para exportar (solo admin)"
+      operationId: listar_anios_exportables_api_exportar_anios_get
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AniosDisponiblesResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /api/exportar:
+    get:
+      tags:
+        - "Exportación"
+      summary: "Exportar registros en XLSX o PDF por streaming (solo admin)"
+      operationId: exportar_registros_api_exportar_get
+      parameters:
+        - name: formato
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: "xlsx | pdf"
+            title: Formato
+          description: "xlsx | pdf"
+        - name: tipo
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: "dias | semanas | mes | anio"
+            title: Tipo
+          description: "dias | semanas | mes | anio"
+        - name: desde
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: "Fecha inicial YYYY-MM-DD"
+            title: Desde
+          description: "Fecha inicial YYYY-MM-DD"
+        - name: hasta
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: "Fecha final YYYY-MM-DD"
+            title: Hasta
+          description: "Fecha final YYYY-MM-DD"
+      responses:
+        "200":
+          description: "Archivo binario en streaming (XLSX o PDF)"
+          content:
+            application/json:
+              schema: "{}"
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet: "{}"
+            application/pdf: "{}"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+  /api/auditoria:
+    get:
+      tags:
+        - "Auditoría"
+      summary: "Listar Auditoria"
+      operationId: listar_auditoria_api_auditoria_get
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            title: Page
+        - name: limit
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            default: "50"
+            title: Limit
+        - name: entidad
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            title: Entidad
+        - name: accion
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            title: Accion
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AuditoriaPaginadaResponse"
+        "422":
+          description: "Error de validación de esquema"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "400":
+          description: "Solicitud o parámetros inválidos"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "401":
+          description: "No autenticado o sesión expirada"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Sin permisos suficientes para este rol"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Recurso no encontrado"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      security:
+        - cookieAuth: "[]"
+components:
+  schemas:
+    AniosDisponiblesResponse:
+      properties:
+        anios:
+          items:
+            type: integer
+          type: array
+          title: Anios
+      type: object
+      required:
+        - anios
+      title: AniosDisponiblesResponse
+    AuditoriaOut:
+      properties:
+        id:
+          type: string
+          title: Id
+        quien:
+          type: string
+          title: Quien
+        accion:
+          type: string
+          title: Accion
+        entidad:
+          type: string
+          title: Entidad
+        entidad_id:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: "Entidad Id"
+        antes:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Antes
+        despues:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: Despues
+        fecha:
+          type: string
+          format: date-time
+          title: Fecha
+      type: object
+      required:
+        - id
+        - quien
+        - accion
+        - entidad
+        - fecha
+      title: AuditoriaOut
+    AuditoriaPaginadaResponse:
+      properties:
+        data:
+          items:
+            "$ref": "#/components/schemas/AuditoriaOut"
+          type: array
+          title: Data
+        page:
+          type: integer
+          title: Page
+        limit:
+          type: integer
+          title: Limit
+        total:
+          type: integer
+          title: Total
+        totalPages:
+          type: integer
+          title: Totalpages
+      type: object
+      required:
+        - data
+        - page
+        - limit
+        - total
+        - totalPages
+      title: AuditoriaPaginadaResponse
+    CambiarPasswordRequest:
+      properties:
+        password_actual:
+          type: string
+          maxLength: 72
+          minLength: 1
+          title: "Password Actual"
+        password_nueva:
+          type: string
+          maxLength: 72
+          minLength: 4
+          title: "Password Nueva"
+      type: object
+      required:
+        - password_actual
+        - password_nueva
+      title: CambiarPasswordRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            "$ref": "#/components/schemas/ValidationError"
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    LoginRequest:
+      properties:
+        nombre:
+          type: string
+          maxLength: 100
+          minLength: 1
+          title: Nombre
+        password:
+          type: string
+          maxLength: 72
+          minLength: 1
+          title: Password
+      type: object
+      required:
+        - nombre
+        - password
+      title: LoginRequest
+    LoginResponse:
+      properties:
+        usuario:
+          "$ref": "#/components/schemas/UsuarioOut"
+        expira:
+          type: string
+          format: date-time
+          title: Expira
+      type: object
+      required:
+        - usuario
+        - expira
+      title: LoginResponse
+    MeResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        nombre:
+          type: string
+          title: Nombre
+        rol:
+          type: string
+          title: Rol
+        activo:
+          type: boolean
+          title: Activo
+        expira:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: Expira
+      type: object
+      required:
+        - id
+        - nombre
+        - rol
+        - activo
+      title: MeResponse
+    MessageResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+      type: object
+      required:
+        - detail
+      title: MessageResponse
+    RegistrosPaginadosResponse:
+      properties:
+        data:
+          items:
+            "$ref": "#/components/schemas/Ticket"
+          type: array
+          title: Data
+        page:
+          type: integer
+          title: Page
+        limit:
+          type: integer
+          title: Limit
+        total:
+          type: integer
+          title: Total
+        totalPages:
+          type: integer
+          title: Totalpages
+      type: object
+      required:
+        - data
+        - page
+        - limit
+        - total
+        - totalPages
+      title: RegistrosPaginadosResponse
+    Ticket:
+      properties:
+        placa:
+          type: string
+          pattern: "^[A-Z0-9-]+$"
+          title: Placa
+        id_tipo_vehiculo:
+          type: string
+          title: "Id Tipo Vehiculo"
+        id:
+          type: string
+          title: Id
+        nombre_parqueadero:
+          type: string
+          title: "Nombre Parqueadero"
+        fecha_ingreso:
+          type: string
+          format: date-time
+          title: "Fecha Ingreso"
+        fecha_salida:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+          title: "Fecha Salida"
+        total_horas:
+          anyOf:
+            - type: number
+            - type: "null"
+          title: "Total Horas"
+        precio_total:
+          anyOf:
+            - type: number
+            - type: "null"
+          title: "Precio Total"
+        precio_calculado:
+          anyOf:
+            - type: number
+            - type: "null"
+          title: "Precio Calculado"
+        precio_final:
+          anyOf:
+            - type: number
+            - type: "null"
+          title: "Precio Final"
+        motivo_ajuste:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: "Motivo Ajuste"
+        eliminado:
+          type: boolean
+          title: Eliminado
+          default: false
+        estado:
+          type: string
+          title: Estado
+          default: ACTIVO
+      type: object
+      required:
+        - placa
+        - id_tipo_vehiculo
+        - id
+        - nombre_parqueadero
+        - fecha_ingreso
+      title: Ticket
+    TicketCreate:
+      properties:
+        placa:
+          type: string
+          pattern: "^[A-Z0-9-]+$"
+          title: Placa
+        id_tipo_vehiculo:
+          type: string
+          title: "Id Tipo Vehiculo"
+        nombre_parqueadero:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: "Nombre Parqueadero"
+          default: "PARQUEADERO BAHONDO"
+      type: object
+      required:
+        - placa
+        - id_tipo_vehiculo
+      title: TicketCreate
+    TicketEditarPrecio:
+      properties:
+        precio_final:
+          type: number
+          minimum: 0.0
+          title: "Precio Final"
+        motivo_ajuste:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: "Motivo Ajuste"
+      type: object
+      required:
+        - precio_final
+        - motivo_ajuste
+      title: TicketEditarPrecio
+    TicketSalida:
+      properties:
+        precio_personalizado:
+          anyOf:
+            - type: number
+              minimum: 0.0
+            - type: "null"
+          title: "Precio Personalizado"
+        motivo_ajuste:
+          anyOf:
+            - type: string
+              maxLength: 255
+            - type: "null"
+          title: "Motivo Ajuste"
+      type: object
+      title: TicketSalida
+    TicketUpdateAdmin:
+      properties:
+        placa:
+          anyOf:
+            - type: string
+              pattern: "^[A-Z0-9-]+$"
+            - type: "null"
+          title: Placa
+        id_tipo_vehiculo:
+          anyOf:
+            - type: string
+            - type: "null"
+          title: "Id Tipo Vehiculo"
+        nombre_parqueadero:
+          anyOf:
+            - type: string
+              maxLength: 120
+              minLength: 1
+            - type: "null"
+          title: "Nombre Parqueadero"
+        precio_final:
+          anyOf:
+            - type: number
+              minimum: 0.0
+            - type: "null"
+          title: "Precio Final"
+        motivo_ajuste:
+          anyOf:
+            - type: string
+              maxLength: 255
+            - type: "null"
+          title: "Motivo Ajuste"
+      type: object
+      title: TicketUpdateAdmin
+    TipoVehiculo:
+      properties:
+        nombre:
+          type: string
+          pattern: "^[A-ZÑ\\s]+$"
+          title: Nombre
+        tarifa_hora:
+          type: number
+          minimum: 0.0
+          title: "Tarifa Hora"
+        tarifa_dia:
+          type: number
+          minimum: 0.0
+          title: "Tarifa Dia"
+        tarifa_noche:
+          type: number
+          minimum: 0.0
+          title: "Tarifa Noche"
+        id:
+          type: string
+          title: Id
+      type: object
+      required:
+        - nombre
+        - tarifa_hora
+        - tarifa_dia
+        - tarifa_noche
+        - id
+      title: TipoVehiculo
+    TipoVehiculoCreate:
+      properties:
+        nombre:
+          type: string
+          pattern: "^[A-ZÑ\\s]+$"
+          title: Nombre
+        tarifa_hora:
+          type: number
+          minimum: 0.0
+          title: "Tarifa Hora"
+        tarifa_dia:
+          type: number
+          minimum: 0.0
+          title: "Tarifa Dia"
+        tarifa_noche:
+          type: number
+          minimum: 0.0
+          title: "Tarifa Noche"
+      type: object
+      required:
+        - nombre
+        - tarifa_hora
+        - tarifa_dia
+        - tarifa_noche
+      title: TipoVehiculoCreate
+    UsuarioOut:
+      properties:
+        id:
+          type: string
+          title: Id
+        nombre:
+          type: string
+          title: Nombre
+        rol:
+          type: string
+          title: Rol
+        activo:
+          type: boolean
+          title: Activo
+        creado:
+          type: string
+          format: date-time
+          title: Creado
+      type: object
+      required:
+        - id
+        - nombre
+        - rol
+        - activo
+        - creado
+      title: UsuarioOut
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: "Error Type"
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
+    ErrorDetail:
+      type: object
+      required:
+        - codigo
+        - mensaje
+      properties:
+        codigo:
+          type: string
+          example: NO_AUTENTICADO
+        mensaje:
+          type: string
+          example: "No autenticado o sesión expirada"
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          "$ref": "#/components/schemas/ErrorDetail"
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_id
+      description: "Sesión emitida por POST /api/auth/login (HttpOnly, SameSite=Strict, sin JWT)."

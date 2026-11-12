@@ -2,64 +2,135 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Imprimir Ticket</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imprimir Ticket — Parqueadero POS</title>
     <link href="style.css" rel="stylesheet">
 </head>
-<body class="bg-light">
+<body class="pos-screen-body">
 
-<!-- El contenedor principal que se imprimirá -->
-<div id="printable-ticket" class="pos-ticket shadow-sm my-4">
-    <div class="text-center mb-2">
-        <h3>PARQUEADERO</h3>
-        <h4 id="t-nombre-parq">---</h4>
+<!-- Barra de acciones visible únicamente en pantalla -->
+<div class="pos-screen-toolbar no-print">
+    <button type="button" id="btn-print-now" class="btn-parq btn-parq-sage btn-parq-sm">
+        🖨️ Imprimir Ticket
+    </button>
+    <button type="button" id="btn-close-window" class="btn-parq btn-parq-outline btn-parq-sm" style="background:#fff;">
+        ✕ Cerrar Ventana
+    </button>
+</div>
+
+<!-- Contenedor principal calibrado para impresora térmica POS de 80mm (78mm útiles) -->
+<div id="printable-ticket" class="pos-ticket">
+    <div class="pos-header">
+        <div class="pos-brand-box">
+            <h3 class="pos-brand-title" id="t-nombre-parq">PARQUEADERO BAHONDO</h3>
+        </div>
+        <div class="pos-subtitle" style="font-size: 10px;">CONTROL Y CUSTODIA VEHICULAR</div>
     </div>
-    
-    <div class="divider"></div>
-    
-    <div class="text-center mb-2">
-        <h2 id="t-titulo" style="margin:0;">TICKET</h2>
-        <h4 id="t-placa" style="font-size: 24px; margin: 5px 0;">XXX-000</h4>
+
+    <div class="pos-type-banner" id="t-titulo">COMPROBANTE DE INGRESO</div>
+
+    <div class="pos-placa-box">
+        <div class="pos-placa-label">PLACA DEL VEHÍCULO</div>
+        <div class="pos-placa-value" id="t-placa">XXX-000</div>
     </div>
-    
-    <div class="divider"></div>
-    
+
     <div class="row-data">
-        <span>TICKET No:</span>
-        <span id="t-id" style="font-size: 10px;">...</span>
+        <span class="row-label">TICKET N°:</span>
+        <span class="row-val" id="t-id">...</span>
     </div>
     <div class="row-data">
-        <span>INGRESO:</span>
-        <span id="t-ingreso">...</span>
+        <span class="row-label">ESTADO:</span>
+        <span class="row-val" id="t-estado">EN PARQUEADERO</span>
     </div>
-    
-    <!-- Estos campos solo se muestran si es salida -->
+    <div class="row-data">
+        <span class="row-label">INGRESO:</span>
+        <span class="row-val" id="t-ingreso">...</span>
+    </div>
+
+    <!-- Sección exclusiva para liquidación / salida -->
     <div id="seccion-salida" style="display: none;">
         <div class="row-data">
-            <span>SALIDA:</span>
-            <span id="t-salida">...</span>
+            <span class="row-label">SALIDA:</span>
+            <span class="row-val" id="t-salida">...</span>
         </div>
         <div class="row-data">
-            <span>TIEMPO:</span>
-            <span id="t-horas">... h</span>
+            <span class="row-label">ESTADÍA:</span>
+            <span class="row-val"><span id="t-horas">0</span> hora(s)</span>
         </div>
-        <div class="divider"></div>
-        <div class="row-data" style="font-size: 18px; font-weight: bold;">
-            <span>TOTAL:</span>
+        <div class="row-data" id="fila-ajuste" style="display: none;">
+            <span class="row-label">AJUSTE:</span>
+            <span class="row-val" id="t-ajuste" style="font-size: 11px;">---</span>
+        </div>
+
+        <div class="pos-total-box">
+            <span>TOTAL A PAGAR:</span>
             <span id="t-total">$0</span>
         </div>
     </div>
-    
-    <div class="divider"></div>
-    
-    <div class="text-center mt-3" style="font-size: 12px;">
-        <p id="t-mensaje" class="mb-1">Conserve este ticket.</p>
-        <p>No nos hacemos responsables por objetos de valor dejados en el vehículo.</p>
-        <p>¡Gracias por su visita!</p>
+
+    <!-- Reglamento y condiciones solicitadas -->
+    <div class="pos-rules-box">
+        <div class="pos-rules-title">REGLAMENTO Y CONDICIONES</div>
+        <ul class="pos-rules-list">
+            <li>
+                <strong>OBJETOS PERSONALES:</strong> No nos hacemos responsables por objetos personales, cascos, paquetes o elementos de valor dejados en el vehículo.
+            </li>
+            <li>
+                <strong>PÉRDIDA DEL TICKET:</strong> En caso de perder este ticket, para retirar el vehículo se debe presentar obligatoriamente la <strong>TARJETA DE PROPIEDAD</strong> y documento de identidad.
+            </li>
+            <li>
+                Verifique que la placa registrada coincida con su vehículo.
+            </li>
+        </ul>
     </div>
-    
-    <!-- Simulación de código de barras para el POS -->
-    <div class="barcode">
-        || | ||| || ||| || ||| || | ||
+
+    <div class="text-center" style="font-size: 11.5px; font-weight: 700; margin-top: 6px;">
+        <div id="t-mensaje">Conserve este ticket para retirar su vehículo.</div>
+        <div style="margin-top: 3px; font-weight: 900; letter-spacing: 0.04em;">
+            PARQUEADERO BAHONDO — ¡Gracias por su visita!
+        </div>
+    </div>
+
+    <!-- Código de barras vectorial (imprime nítido en térmico sin depender de fondos CSS) -->
+    <div class="pos-barcode-wrap">
+        <svg width="210" height="32" viewBox="0 0 210 32" aria-hidden="true">
+            <rect x="2" y="0" width="3" height="32" fill="#000"/>
+            <rect x="8" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="13" y="0" width="4" height="32" fill="#000"/>
+            <rect x="20" y="0" width="2" height="32" fill="#000"/>
+            <rect x="25" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="30" y="0" width="5" height="32" fill="#000"/>
+            <rect x="38" y="0" width="2" height="32" fill="#000"/>
+            <rect x="43" y="0" width="3" height="32" fill="#000"/>
+            <rect x="50" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="55" y="0" width="4" height="32" fill="#000"/>
+            <rect x="62" y="0" width="2" height="32" fill="#000"/>
+            <rect x="68" y="0" width="3" height="32" fill="#000"/>
+            <rect x="74" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="79" y="0" width="5" height="32" fill="#000"/>
+            <rect x="87" y="0" width="2" height="32" fill="#000"/>
+            <rect x="92" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="97" y="0" width="4" height="32" fill="#000"/>
+            <rect x="104" y="0" width="3" height="32" fill="#000"/>
+            <rect x="110" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="115" y="0" width="4" height="32" fill="#000"/>
+            <rect x="122" y="0" width="2" height="32" fill="#000"/>
+            <rect x="127" y="0" width="5" height="32" fill="#000"/>
+            <rect x="135" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="140" y="0" width="3" height="32" fill="#000"/>
+            <rect x="146" y="0" width="2" height="32" fill="#000"/>
+            <rect x="151" y="0" width="4" height="32" fill="#000"/>
+            <rect x="158" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="163" y="0" width="5" height="32" fill="#000"/>
+            <rect x="171" y="0" width="2" height="32" fill="#000"/>
+            <rect x="176" y="0" width="3" height="32" fill="#000"/>
+            <rect x="182" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="187" y="0" width="4" height="32" fill="#000"/>
+            <rect x="194" y="0" width="2" height="32" fill="#000"/>
+            <rect x="199" y="0" width="1.5" height="32" fill="#000"/>
+            <rect x="204" y="0" width="4" height="32" fill="#000"/>
+        </svg>
+        <div class="pos-barcode-code" id="t-barcode-code">*00000000*</div>
     </div>
 </div>
 
@@ -68,46 +139,72 @@
     const ticketId = urlParams.get('id');
     const tipo = urlParams.get('tipo'); // 'ingreso' o 'salida'
 
+    function formatFechaTicket(iso) {
+        if (!iso) return '---';
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return iso;
+        return d.toLocaleString('es-CO', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+        });
+    }
+
     async function cargarTicket() {
         if (!ticketId) {
-            document.body.innerHTML = "<h3 class='text-center mt-5'>No se proporcionó ID de ticket</h3>";
+            document.body.innerHTML = "<h3 class='text-center' style='color:#fff;margin-top:3rem;'>No se proporcionó ID de ticket</h3>";
             return;
         }
 
         try {
-            const res = await fetch(`/ticket/${ticketId}`);
-            if (!res.ok) throw new Error("Ticket no encontrado");
+            const res = await fetch(`/ticket/${encodeURIComponent(ticketId)}`, {
+                credentials: 'same-origin',
+            });
+            if (!res.ok) throw new Error('Ticket no encontrado');
             const t = await res.json();
-            
-            document.getElementById('t-nombre-parq').innerText = t.nombre_parqueadero.toUpperCase();
+
+            const shortId = String(t.id || '').split('-')[0].toUpperCase();
+            document.getElementById('t-nombre-parq').innerText = 'PARQUEADERO BAHONDO';
             document.getElementById('t-placa').innerText = t.placa;
-            document.getElementById('t-id').innerText = t.id.split('-')[0].toUpperCase(); // Mostrar forma corta
-            document.getElementById('t-ingreso').innerText = new Date(t.fecha_ingreso).toLocaleString();
-            
-            if (tipo === 'salida' && t.fecha_salida) {
-                document.getElementById('t-titulo').innerText = "FACTURA";
+            document.getElementById('t-id').innerText = `#${shortId}`;
+            document.getElementById('t-barcode-code').innerText = `*${t.placa}-${shortId}*`;
+            document.getElementById('t-ingreso').innerText = formatFechaTicket(t.fecha_ingreso);
+
+            if ((tipo === 'salida' || t.estado === 'FINALIZADO') && t.fecha_salida) {
+                const montoCobrado = Number(t.precio_final ?? t.precio_total ?? 0);
+                document.getElementById('t-titulo').innerText = 'RECIBO DE SALIDA Y PAGO';
+                document.getElementById('t-estado').innerText = 'LIQUIDADO / FINALIZADO';
                 document.getElementById('seccion-salida').style.display = 'block';
-                document.getElementById('t-salida').innerText = new Date(t.fecha_salida).toLocaleString();
-                document.getElementById('t-horas').innerText = t.total_horas;
-                document.getElementById('t-total').innerText = `$${t.precio_total.toLocaleString()}`;
-                document.getElementById('t-mensaje').innerText = "Pago exitoso.";
+                document.getElementById('t-salida').innerText = formatFechaTicket(t.fecha_salida);
+                document.getElementById('t-horas').innerText = t.total_horas ?? 1;
+                document.getElementById('t-total').innerText = `$${montoCobrado.toLocaleString()}`;
+                document.getElementById('t-mensaje').innerText = 'Pago registrado exitosamente.';
+
+                if (t.motivo_ajuste) {
+                    document.getElementById('fila-ajuste').style.display = 'flex';
+                    document.getElementById('t-ajuste').innerText = t.motivo_ajuste;
+                }
             } else {
-                document.getElementById('t-titulo').innerText = "INGRESO";
+                document.getElementById('t-titulo').innerText = 'COMPROBANTE DE INGRESO';
+                document.getElementById('t-estado').innerText = 'ACTIVO EN PARQUEADERO';
             }
 
             // Iniciar impresión automáticamente tras cargar los datos
             setTimeout(() => {
                 window.print();
             }, 500);
-
         } catch (error) {
             console.error(error);
-            document.body.innerHTML = "<h3 class='text-center mt-5'>Error cargando el ticket</h3>";
+            document.body.innerHTML = "<h3 class='text-center' style='color:#fff;margin-top:3rem;'>Error cargando el ticket</h3>";
         }
     }
 
+    document.getElementById('btn-print-now')?.addEventListener('click', () => window.print());
+    document.getElementById('btn-close-window')?.addEventListener('click', () => window.close());
     cargarTicket();
 </script>
 </body>
 </html>
-

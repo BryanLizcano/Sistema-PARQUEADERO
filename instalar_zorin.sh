@@ -14,7 +14,7 @@ sudo apt install -y python3-venv python3-pip
 echo "Creando entorno virtual de Python..."
 python3 -m venv .venv
 source .venv/bin/activate
-pip install fastapi uvicorn pydantic sqlalchemy
+pip install fastapi uvicorn pydantic sqlalchemy bcrypt xlsxwriter reportlab pyyaml
 
 # Obtener ruta actual y usuario
 CURRENT_DIR=$(pwd)

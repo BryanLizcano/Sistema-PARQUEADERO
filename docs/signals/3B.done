@@ -1,0 +1,7 @@
+Fase 3B completada:
+- static/registros.html y static/js/pages/registros.js rehechos consumiendo GET /api/registros (50 por pagina, botones Anterior/Siguiente, indicador "Pagina X de Y", filtros por placa y estado con debounce de 220ms y AbortController).
+- Skeletons de carga en tarjetas de resumen KPI y filas de la tabla.
+- Renderizado eficiente con DocumentFragment, delegacion de eventos en tbody y limite estricto de 50 filas en DOM.
+- Estados vacio, error con boton Reintentar y sin conexion (banner + estado en tabla + eventos online/offline).
+- Animaciones suaves al cambiar de pagina (.parq-tbody-transition) respetando prefers-reduced-motion y meta de carga percibida < 300 ms.
+- Pruebas automatizadas en static/js/registros.test.mjs (node --test) en verde y docs/avance.md actualizado.

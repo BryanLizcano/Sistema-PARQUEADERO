@@ -1,0 +1,7 @@
+Fase 3C completada:
+- UI estricta por rol: el cajero no ve botones de editar/eliminar tickets ni paneles/tablas de tarifas; puede ajustar el precio final de un ticket en el modal que muestra Precio Calculado original, Nuevo Precio Final y Motivo obligatorio.
+- Admin: edicion de tarifas (modalConfirmarTarifa), edicion de tickets (modalEditarTicket) y eliminacion de tickets (modalEliminarTicket) con modales de advertencia MUY notables (rojo/ambar, icono, texto explicito de auditoria y confirmacion obligatoria escribiendo "ELIMINAR" para habilitar el borrado).
+- Exportacion Excel/PDF (solo admin): selector de dias (max. 20), semanas (max. 10), mes (max. 31 dias) y anio (max. 366 dias) con validacion visual en tiempo real (validateExportRange) y estado de descarga por streaming.
+- Configuracion: cambio de contrasena exigiendo la contrasena actual (POST /api/auth/cambiar-password).
+- Toasts limpios y profesionales en todas las operaciones, skeletons y animaciones respetando prefers-reduced-motion.
+- Pruebas automatizadas en static/js/registros.test.mjs (3/3 en verde) y docs/avance.md actualizado.
